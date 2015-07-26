@@ -1,0 +1,38 @@
+# See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Toggle atom-smart-tabs'
+      'command': 'atom-smart-tabs:toggle'
+    },
+    {
+      'label': 'Smart Tab Indent'
+      'command': 'atom-smart-tabs:indent'
+    },
+    {
+      'label': 'Smart Tab Outdent'
+      'command': 'atom-smart-tabs:outdent'
+    }
+  ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Smart Tabs'
+      'submenu': [
+        {
+          'label': 'Toggle'
+          'command': 'atom-smart-tabs:toggle'
+        },
+        {
+          'label': 'Indent'
+          'command': 'atom-smart-tabs:indent'
+        },
+        {
+          'label': 'Outdent'
+          'command': 'atom-smart-tabs:outdent'
+        }
+      ]
+    ]
+  }
+]
