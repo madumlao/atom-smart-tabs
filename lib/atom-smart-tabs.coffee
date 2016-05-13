@@ -31,19 +31,7 @@ module.exports = AtomSmartTabs =
 
   indent: ->
     console.log 'AtomSmartTabs Indent'
-    editor = atom.workspace.getActivePaneItem()
-    cursor = editor.getLastCursor()
-    savedPosition = cursor.getScreenPosition()
-
-    # if no text is selected, indent only the current line
-    if editor.getSelectedText().length == 0
-      editor.moveToBeginningOfLine()
-      editor.selectToEndOfLine()
-
-    selections = editor.getSelections()
-    checkpoint = editor.createCheckpoint()
-    @indentSelection(selection) for selection in selections
-    editor.groupChangesSinceCheckpoint(checkpoint)
+    @performDentation(true)
 
   indentSelection: (selection) ->
     editor = atom.workspace.getActivePaneItem()
@@ -119,19 +107,7 @@ module.exports = AtomSmartTabs =
 
   outdent: ->
     console.log 'AtomSmartTabs Outdent'
-    editor = atom.workspace.getActivePaneItem()
-    cursor = editor.getLastCursor()
-    savedPosition = cursor.getScreenPosition()
-
-    # if no text is selected, indent only the current line
-    if editor.getSelectedText().length == 0
-      editor.moveToBeginningOfLine()
-      editor.selectToEndOfLine()
-
-    selections = editor.getSelections()
-    checkpoint = editor.createCheckpoint()
-    @outdentSelection(selection) for selection in selections
-    editor.groupChangesSinceCheckpoint(checkpoint)
+    @performDentation(false)
 
   outdentSelection: (selection) ->
     editor = atom.workspace.getActivePaneItem()
@@ -156,3 +132,39 @@ module.exports = AtomSmartTabs =
       @indentLine(n, newIndent.tabs, newIndent.spaces)
 
       n--
+
+  # doIndent is a flag that if set this performs an indent, otherwise an outdent
+  performDentation: (doIndent) ->
+    editor = atom.workspace.getActivePaneItem()
+    cursors = editor.getCursors()
+    startPositions = []
+    startLineLengths = []
+
+    for i, cursor of cursors
+      startPositions.push cursor.getBufferPosition()
+      startLineLengths.push cursor.getCurrentLineBufferRange().end.column
+
+    # if no text is selected, indent the lines of each cursor
+    noInitialSelections = false
+    if editor.getSelectedText().length == 0
+      noInitialSelections = true
+      editor.moveToBeginningOfLine()
+      editor.selectToEndOfLine()
+
+    selections = editor.getSelections()
+    checkpoint = editor.createCheckpoint()
+
+    if doIndent
+      @indentSelection(selection) for selection in selections
+    else
+      @outdentSelection(selection) for selection in selections
+
+    if noInitialSelections
+      # re-adjust each cursor by the (in/out)dented amount
+      for i, cursor of cursors
+        endLineLength = cursor.getCurrentLineBufferRange().end.column
+        newPosition = startPositions[i]
+        newPosition.column += (endLineLength - startLineLengths[i])
+        cursor.setBufferPosition(newPosition)
+
+    editor.groupChangesSinceCheckpoint(checkpoint)
