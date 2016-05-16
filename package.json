@@ -1,7 +1,7 @@
 {
   "name": "atom-smart-tabs",
   "main": "./lib/atom-smart-tabs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Use 'smart tabs' for indentation (tabs for block levels, spaces for alignment)",
   "keywords": [
   ],
